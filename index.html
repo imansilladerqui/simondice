@@ -10,7 +10,120 @@
     <link rel="stylesheet" href="simon.css" />
   </head>
   <body>
+    <!-- Level Progress Bar -->
+    <div class="level-progress">
+      <div class="level-progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Theme Selector -->
+    <div class="theme-selector" id="themeSelector">
+      <div class="theme-title">🎨 Temas</div>
+      <div class="theme-options">
+        <button class="theme-btn active" data-theme="dark" title="Tema Oscuro">
+          🌙
+        </button>
+        <button class="theme-btn" data-theme="neon" title="Tema Neon">
+          ⚡
+        </button>
+        <button class="theme-btn" data-theme="ocean" title="Tema Océano">
+          🌊
+        </button>
+        <button class="theme-btn" data-theme="sunset" title="Tema Atardecer">
+          🌅
+        </button>
+        <button class="theme-btn" data-theme="forest" title="Tema Bosque">
+          🌲
+        </button>
+      </div>
+    </div>
+
+    <!-- Key Customization Panel -->
+    <div class="key-customizer" id="keyCustomizer">
+      <div class="customizer-title">🎹 Personalizar Teclas</div>
+      <div class="customizer-options">
+        <button
+          class="customizer-btn active"
+          data-key-set="vowels"
+          title="Solo Vocales"
+        >
+          AEIOU
+        </button>
+        <button
+          class="customizer-btn"
+          data-key-set="alphabet"
+          title="Alfabeto Completo"
+        >
+          A-Z
+        </button>
+        <button class="customizer-btn" data-key-set="numbers" title="Números">
+          0-9
+        </button>
+        <button class="customizer-btn" data-key-set="mixed" title="Mixto">
+          A-Z + 0-9
+        </button>
+      </div>
+    </div>
+
+    <!-- Score Display -->
+    <div class="score-display" id="scoreDisplay">
+      <div class="score-section">
+        <div class="score-label">Puntuación</div>
+        <div class="score-value" id="currentScore">0</div>
+      </div>
+      <div class="score-section">
+        <div class="score-label">Racha</div>
+        <div class="score-value" id="currentStreak">0</div>
+      </div>
+      <div class="score-section">
+        <div class="score-label">Logros</div>
+        <div class="score-value" id="achievementCount">0/12</div>
+      </div>
+    </div>
+
+    <!-- High Score Panel -->
+    <div class="high-score-panel" id="highScorePanel">
+      <div class="high-score-title">🏆 Mejores Marcas</div>
+      <div class="high-score-item">
+        <span class="high-score-label">Mejor Puntuación:</span>
+        <span class="high-score-value" id="bestScore">0</span>
+      </div>
+      <div class="high-score-item">
+        <span class="high-score-label">Mejor Racha:</span>
+        <span class="high-score-value" id="bestStreak">0</span>
+      </div>
+      <div class="high-score-item">
+        <span class="high-score-label">Mejor Nivel:</span>
+        <span class="high-score-value" id="bestLevel">0</span>
+      </div>
+      <div class="high-score-item">
+        <span class="high-score-label">Partidas Jugadas:</span>
+        <span class="high-score-value" id="totalGames">0</span>
+      </div>
+    </div>
+
+    <!-- Difficulty Indicator -->
+    <div class="difficulty-indicator" id="difficultyIndicator">
+      <div class="difficulty-phase" id="difficultyPhase">Aprendiendo</div>
+      <div class="difficulty-features" id="difficultyFeatures">
+        🔊 Audio cues • 👁️ Visual hints
+      </div>
+    </div>
+
     <div class="keyboard">
+      <!-- Number row (hidden by default, shown in hard difficulty) -->
+      <div class="row number-row" style="display: none">
+        <div class="key" data-key="48">0</div>
+        <div class="key" data-key="49">1</div>
+        <div class="key" data-key="50">2</div>
+        <div class="key" data-key="51">3</div>
+        <div class="key" data-key="52">4</div>
+        <div class="key" data-key="53">5</div>
+        <div class="key" data-key="54">6</div>
+        <div class="key" data-key="55">7</div>
+        <div class="key" data-key="56">8</div>
+        <div class="key" data-key="57">9</div>
+      </div>
+
       <div class="row">
         <div class="key" data-key="81">q</div>
         <div class="key" data-key="87">w</div>
@@ -46,53 +159,556 @@
     </div>
     <script src="sweetalert.min.js"></script>
     <script>
-      const niveles = 15;
-      let teclas = generarTeclas(niveles);
+      // Enhanced Difficulty System
+      class DifficultyManager {
+        constructor() {
+          this.difficultyPhases = {
+            LEARNING: {
+              name: "Aprendiendo",
+              levels: [0, 4],
+              sequenceLength: (level) => level + 1,
+              playbackSpeed: 1200,
+              keyComplexity: "easy",
+              audioEnabled: true,
+              visualCues: true,
+              description: "🔊 Audio cues • 👁️ Visual hints",
+            },
+            BUILDING: {
+              name: "Construyendo",
+              levels: [5, 9],
+              sequenceLength: (level) => level + 1,
+              playbackSpeed: 1000,
+              keyComplexity: "medium",
+              audioEnabled: true,
+              visualCues: false,
+              description: "🔊 Audio cues • 💪 Full alphabet",
+            },
+            CHALLENGING: {
+              name: "Desafiante",
+              levels: [10, 14],
+              sequenceLength: (level) => level + 2,
+              playbackSpeed: 800,
+              keyComplexity: "hard",
+              audioEnabled: false,
+              visualCues: false,
+              description: "⚡ Fast speed • 🎯 Numbers included",
+            },
+            EXPERT: {
+              name: "Experto",
+              levels: [15, Infinity],
+              sequenceLength: (level) => Math.min(level + 3, 25),
+              playbackSpeed: 600,
+              keyComplexity: "expert",
+              audioEnabled: false,
+              visualCues: false,
+              description: "💪 Expert mode • 🚀 Maximum speed",
+            },
+          };
+        }
 
-      function siguienteNivel(nivelActual) {
-        if (nivelActual == niveles) {
-          return swal({
-            title: "Ganaste!",
-            type: "success",
+        getDifficultyForLevel(level) {
+          for (const [phaseName, phase] of Object.entries(
+            this.difficultyPhases
+          )) {
+            if (level >= phase.levels[0] && level <= phase.levels[1]) {
+              return { ...phase, phaseName };
+            }
+          }
+          return this.difficultyPhases.EXPERT;
+        }
+
+        getKeySetForComplexity(complexity) {
+          switch (complexity) {
+            case "easy":
+              return [65, 69, 73, 79, 85]; // A, E, I, O, U
+            case "medium":
+              return Array.from({ length: 26 }, (_, i) => i + 65); // A-Z
+            case "hard":
+              // Numbers 0-9 (48-57) + Letters A-Z (65-90)
+              return [
+                ...Array.from({ length: 10 }, (_, i) => i + 48),
+                ...Array.from({ length: 26 }, (_, i) => i + 65),
+              ];
+            case "expert":
+              return Array.from({ length: 26 }, (_, i) => i + 65); // A-Z for now
+          }
+        }
+
+        generateSequenceForLevel(level) {
+          const difficulty = this.getDifficultyForLevel(level);
+          const keySet = this.getKeySetForComplexity(difficulty.keyComplexity);
+          const sequenceLength = difficulty.sequenceLength(level);
+
+          return new Array(sequenceLength).fill(0).map(() => {
+            const randomIndex = Math.floor(Math.random() * keySet.length);
+            return keySet[randomIndex];
           });
         }
+      }
+
+      // Scoring & Progression System
+      class ScoreManager {
+        constructor() {
+          this.currentScore = 0;
+          this.currentStreak = 0;
+          this.maxStreak = 0;
+          this.levelStartTime = 0;
+          this.totalPlayTime = 0;
+          this.achievements = new Set();
+          this.highScores = this.loadHighScores();
+          this.init();
+        }
+
+        init() {
+          this.updateScoreDisplay();
+          this.loadAchievements();
+        }
+
+        // Score calculation based on speed and accuracy
+        calculateLevelScore(level, timeTaken, isCorrect) {
+          if (!isCorrect) return 0;
+
+          const basePoints = (level + 1) * 100; // Base points per level
+          const timeBonus = Math.max(0, 1000 - timeTaken) / 10; // Speed bonus
+          const streakBonus = this.currentStreak * 50; // Streak multiplier
+          const difficultyMultiplier = this.getDifficultyMultiplier(level);
+
+          return Math.floor(
+            (basePoints + timeBonus + streakBonus) * difficultyMultiplier
+          );
+        }
+
+        getDifficultyMultiplier(level) {
+          if (level < 5) return 1.0; // Learning phase
+          if (level < 10) return 1.2; // Building phase
+          if (level < 15) return 1.5; // Challenging phase
+          return 2.0; // Expert phase
+        }
+
+        addScore(points) {
+          this.currentScore += points;
+          this.currentStreak++;
+          this.maxStreak = Math.max(this.maxStreak, this.currentStreak);
+          this.updateScoreDisplay();
+          this.checkAchievements();
+        }
+
+        resetStreak() {
+          this.currentStreak = 0;
+          this.updateScoreDisplay();
+        }
+
+        startLevel() {
+          this.levelStartTime = Date.now();
+        }
+
+        endLevel(isCorrect) {
+          const timeTaken = Date.now() - this.levelStartTime;
+          const points = this.calculateLevelScore(
+            currentLevel,
+            timeTaken,
+            isCorrect
+          );
+
+          if (isCorrect) {
+            this.addScore(points);
+          } else {
+            this.resetStreak();
+          }
+
+          return points;
+        }
+
+        // High Score Management
+        loadHighScores() {
+          const saved = localStorage.getItem("simonHighScores");
+          return saved
+            ? JSON.parse(saved)
+            : {
+                bestScore: 0,
+                bestStreak: 0,
+                bestLevel: 0,
+                totalGames: 0,
+                totalPlayTime: 0,
+              };
+        }
+
+        saveHighScores() {
+          this.highScores.bestScore = Math.max(
+            this.highScores.bestScore,
+            this.currentScore
+          );
+          this.highScores.bestStreak = Math.max(
+            this.highScores.bestStreak,
+            this.maxStreak
+          );
+          this.highScores.bestLevel = Math.max(
+            this.highScores.bestLevel,
+            currentLevel
+          );
+          this.highScores.totalGames++;
+          this.highScores.totalPlayTime += this.totalPlayTime;
+
+          localStorage.setItem(
+            "simonHighScores",
+            JSON.stringify(this.highScores)
+          );
+        }
+
+        // Achievement System
+        loadAchievements() {
+          const saved = localStorage.getItem("simonAchievements");
+          this.achievements = saved ? new Set(JSON.parse(saved)) : new Set();
+          this.updateAchievementDisplay();
+        }
+
+        saveAchievements() {
+          localStorage.setItem(
+            "simonAchievements",
+            JSON.stringify([...this.achievements])
+          );
+        }
+
+        checkAchievements() {
+          const newAchievements = [];
+
+          // Score-based achievements
+          if (
+            this.currentScore >= 1000 &&
+            !this.achievements.has("first_thousand")
+          ) {
+            this.achievements.add("first_thousand");
+            newAchievements.push({
+              id: "first_thousand",
+              name: "Primer Mil",
+              description: "Alcanza 1000 puntos",
+            });
+          }
+
+          if (
+            this.currentScore >= 5000 &&
+            !this.achievements.has("five_k_club")
+          ) {
+            this.achievements.add("five_k_club");
+            newAchievements.push({
+              id: "five_k_club",
+              name: "Club de los 5K",
+              description: "Alcanza 5000 puntos",
+            });
+          }
+
+          if (
+            this.currentScore >= 10000 &&
+            !this.achievements.has("ten_k_master")
+          ) {
+            this.achievements.add("ten_k_master");
+            newAchievements.push({
+              id: "ten_k_master",
+              name: "Maestro de los 10K",
+              description: "Alcanza 10000 puntos",
+            });
+          }
+
+          // Streak achievements
+          if (
+            this.currentStreak >= 5 &&
+            !this.achievements.has("streak_starter")
+          ) {
+            this.achievements.add("streak_starter");
+            newAchievements.push({
+              id: "streak_starter",
+              name: "Iniciador de Racha",
+              description: "Consigue una racha de 5",
+            });
+          }
+
+          if (
+            this.currentStreak >= 10 &&
+            !this.achievements.has("streak_master")
+          ) {
+            this.achievements.add("streak_master");
+            newAchievements.push({
+              id: "streak_master",
+              name: "Maestro de Rachas",
+              description: "Consigue una racha de 10",
+            });
+          }
+
+          if (
+            this.currentStreak >= 20 &&
+            !this.achievements.has("streak_legend")
+          ) {
+            this.achievements.add("streak_legend");
+            newAchievements.push({
+              id: "streak_legend",
+              name: "Leyenda de Rachas",
+              description: "Consigue una racha de 20",
+            });
+          }
+
+          // Level achievements
+          if (currentLevel >= 5 && !this.achievements.has("level_five")) {
+            this.achievements.add("level_five");
+            newAchievements.push({
+              id: "level_five",
+              name: "Nivel Cinco",
+              description: "Alcanza el nivel 5",
+            });
+          }
+
+          if (currentLevel >= 10 && !this.achievements.has("level_ten")) {
+            this.achievements.add("level_ten");
+            newAchievements.push({
+              id: "level_ten",
+              name: "Nivel Diez",
+              description: "Alcanza el nivel 10",
+            });
+          }
+
+          if (currentLevel >= 15 && !this.achievements.has("level_fifteen")) {
+            this.achievements.add("level_fifteen");
+            newAchievements.push({
+              id: "level_fifteen",
+              name: "Nivel Quince",
+              description: "Alcanza el nivel 15",
+            });
+          }
+
+          // Show new achievements
+          newAchievements.forEach((achievement) => {
+            this.showAchievementNotification(achievement);
+          });
+
+          if (newAchievements.length > 0) {
+            this.saveAchievements();
+            this.updateAchievementDisplay();
+          }
+        }
+
+        showAchievementNotification(achievement) {
+          swal({
+            title: "🏆 ¡Logro Desbloqueado!",
+            text: `<strong>${achievement.name}</strong><br>${achievement.description}`,
+            type: "success",
+            timer: 3000,
+            showConfirmButton: false,
+            html: true,
+          });
+        }
+
+        updateScoreDisplay() {
+          const scoreElement = document.getElementById("currentScore");
+          const streakElement = document.getElementById("currentStreak");
+
+          if (scoreElement)
+            scoreElement.textContent = this.currentScore.toLocaleString();
+          if (streakElement) streakElement.textContent = this.currentStreak;
+        }
+
+        updateAchievementDisplay() {
+          const achievementElement =
+            document.getElementById("achievementCount");
+          if (achievementElement) {
+            achievementElement.textContent = `${this.achievements.size}/12`;
+          }
+        }
+
+        resetGame() {
+          this.currentScore = 0;
+          this.currentStreak = 0;
+          this.maxStreak = 0;
+          this.totalPlayTime = 0;
+          this.updateScoreDisplay();
+        }
+      }
+
+      // Initialize game with enhanced difficulty
+      const niveles = 20; // Increased max levels
+      const difficultyManager = new DifficultyManager();
+      const scoreManager = new ScoreManager();
+      let currentSequence = [];
+      let currentLevel = 0;
+
+      function siguienteNivel(nivelActual) {
+        currentLevel = nivelActual;
+
+        if (nivelActual >= niveles) {
+          // Game completed - save high scores
+          scoreManager.saveHighScores();
+          return swal({
+            title: "¡Ganaste!",
+            text: `¡Has completado todos los niveles!<br><strong>Puntuación Final: ${scoreManager.currentScore.toLocaleString()}</strong>`,
+            type: "success",
+            html: true,
+          });
+        }
+
+        const difficulty = difficultyManager.getDifficultyForLevel(nivelActual);
+
+        // Start level timing for scoring
+        scoreManager.startLevel();
+
+        // Update visual indicators
+        updateDifficultyIndicator(difficulty);
+        updateProgressBar(nivelActual);
+        updateHighScoreDisplay();
+
+        // Generate new sequence for this level
+        currentSequence =
+          difficultyManager.generateSequenceForLevel(nivelActual);
+
+        // Show level with difficulty information
         swal({
           title: `Nivel ${nivelActual + 1}`,
-          timer: 1000,
+          text: `${difficulty.name} - ${difficulty.description}`,
+          timer: 1500,
           showConfirmButton: false,
         });
 
-        for (let i = 0; i <= nivelActual; i++) {
-          setTimeout(() => activate(teclas[i]), 1000 * (i + 1) + 1000);
+        // Play sequence with adaptive timing
+        playSequenceWithDifficulty(currentSequence, difficulty);
+
+        // Set up input handling
+        setupInputHandling(nivelActual);
+      }
+
+      function updateDifficultyIndicator(difficulty) {
+        document.getElementById("difficultyPhase").textContent =
+          difficulty.name;
+        document.getElementById("difficultyFeatures").textContent =
+          difficulty.description;
+
+        // Show/hide number row based on difficulty
+        const numberRow = document.querySelector(".number-row");
+        if (
+          difficulty.keyComplexity === "hard" ||
+          difficulty.keyComplexity === "expert"
+        ) {
+          numberRow.style.display = "flex";
+        } else {
+          numberRow.style.display = "none";
         }
+      }
+
+      function updateProgressBar(level) {
+        const progress = ((level + 1) / niveles) * 100;
+        document.getElementById("progressBar").style.width = `${progress}%`;
+      }
+
+      function updateHighScoreDisplay() {
+        document.getElementById("bestScore").textContent =
+          scoreManager.highScores.bestScore.toLocaleString();
+        document.getElementById("bestStreak").textContent =
+          scoreManager.highScores.bestStreak;
+        document.getElementById("bestLevel").textContent =
+          scoreManager.highScores.bestLevel;
+        document.getElementById("totalGames").textContent =
+          scoreManager.highScores.totalGames;
+      }
+
+      function showPointsEarned(points) {
+        // Create floating points animation
+        const pointsElement = document.createElement("div");
+        pointsElement.className = "floating-points";
+        pointsElement.textContent = `+${points}`;
+        pointsElement.style.cssText = `
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          color: var(--success-color);
+          font-size: 24px;
+          font-weight: bold;
+          z-index: 10000;
+          pointer-events: none;
+          animation: floatUp 2s ease-out forwards;
+        `;
+
+        document.body.appendChild(pointsElement);
+
+        // Remove element after animation
+        setTimeout(() => {
+          if (pointsElement.parentNode) {
+            pointsElement.parentNode.removeChild(pointsElement);
+          }
+        }, 2000);
+      }
+
+      function playSequenceWithDifficulty(sequence, difficulty) {
+        sequence.forEach((keyCode, index) => {
+          // Progressive speed increase within sequence
+          const speedVariation = index * 30;
+          const actualSpeed = Math.max(
+            difficulty.playbackSpeed - speedVariation,
+            200
+          );
+
+          setTimeout(() => {
+            activate(keyCode);
+            // Add audio feedback if enabled
+            if (difficulty.audioEnabled) {
+              playKeySound(keyCode);
+            }
+          }, difficulty.playbackSpeed * (index + 1) + 1500);
+        });
+      }
+
+      function setupInputHandling(nivelActual) {
         let i = 0;
-        let TeclaActual = teclas[i];
+        let TeclaActual = currentSequence[i];
+        const difficulty = difficultyManager.getDifficultyForLevel(nivelActual);
+
         window.addEventListener("keydown", onkeydown);
 
         function onkeydown(ev) {
           if (ev.keyCode == TeclaActual) {
             activate(TeclaActual, { success: true });
-            i++;
-            if (i > nivelActual) {
-              window.removeEventListener("keydown", onkeydown);
-              setTimeout(() => siguienteNivel(i), 1500);
+            if (difficulty.audioEnabled) {
+              playSuccessSound();
             }
-            TeclaActual = teclas[i];
+            i++;
+            if (i >= currentSequence.length) {
+              // Level completed successfully
+              const points = scoreManager.endLevel(true);
+              window.removeEventListener("keydown", onkeydown);
+
+              // Show points earned
+              if (points > 0) {
+                showPointsEarned(points);
+              }
+
+              setTimeout(() => siguienteNivel(nivelActual + 1), 1500);
+            } else {
+              TeclaActual = currentSequence[i];
+            }
           } else {
+            // Wrong key pressed
+            scoreManager.endLevel(false);
             activate(ev.keyCode, { fail: true });
             window.removeEventListener("keydown", onkeydown);
+            playFailureSound();
+
+            // Save high scores on game over
+            scoreManager.saveHighScores();
+
+            const difficulty =
+              difficultyManager.getDifficultyForLevel(nivelActual);
             swal(
               {
-                title: "Pediste!",
-                text: "¿Quieres jugar de nuevo?",
+                title: "¡Perdiste!",
+                text: `Nivel ${nivelActual + 1} - ${
+                  difficulty.name
+                }<br><strong>Puntuación: ${scoreManager.currentScore.toLocaleString()}</strong><br>¿Quieres jugar de nuevo?`,
                 showCancelButton: true,
-                confirmButtonText: "si",
-                cancelButtonText: "no",
+                confirmButtonText: "Sí",
+                cancelButtonText: "No",
                 closeOnConfirm: true,
+                html: true,
               },
               function (ok) {
                 if (ok) {
-                  teclas = generarTeclas(niveles);
+                  scoreManager.resetGame();
+                  currentLevel = 0;
                   siguienteNivel(0);
                 }
               }
@@ -101,18 +717,172 @@
         }
       }
 
+      // Audio feedback functions
+      function playKeySound(keyCode) {
+        // Simple beep sound based on key
+        const frequency = 200 + (keyCode % 10) * 100;
+        playTone(frequency, 0.1);
+      }
+
+      function playSuccessSound() {
+        playTone(800, 0.2);
+      }
+
+      function playFailureSound() {
+        playTone(200, 0.5);
+      }
+
+      function playTone(frequency, duration) {
+        try {
+          const audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.frequency.value = frequency;
+          oscillator.type = "sine";
+
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + duration
+          );
+
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + duration);
+        } catch (e) {
+          // Audio not supported, continue silently
+        }
+      }
+
+      // Theme Management System
+      class ThemeManager {
+        constructor() {
+          this.currentTheme = "dark";
+          this.init();
+        }
+
+        init() {
+          // Load saved theme or default to dark
+          const savedTheme = localStorage.getItem("simonTheme") || "dark";
+          this.setTheme(savedTheme);
+          this.setupEventListeners();
+        }
+
+        setupEventListeners() {
+          const themeButtons = document.querySelectorAll(".theme-btn");
+          themeButtons.forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              const theme = e.target.dataset.theme;
+              this.setTheme(theme);
+            });
+          });
+        }
+
+        setTheme(themeName) {
+          // Remove all theme classes
+          document.body.className = document.body.className.replace(
+            /theme-\w+/g,
+            ""
+          );
+
+          // Add new theme class
+          if (themeName !== "dark") {
+            document.body.classList.add(`theme-${themeName}`);
+          }
+
+          // Update active button
+          document.querySelectorAll(".theme-btn").forEach((btn) => {
+            btn.classList.remove("active");
+          });
+          document
+            .querySelector(`[data-theme="${themeName}"]`)
+            .classList.add("active");
+
+          // Save theme preference
+          this.currentTheme = themeName;
+          localStorage.setItem("simonTheme", themeName);
+        }
+      }
+
+      // Key Customization System
+      class KeyCustomizer {
+        constructor() {
+          this.currentKeySet = "vowels";
+          this.init();
+        }
+
+        init() {
+          // Load saved key set or default to vowels
+          const savedKeySet = localStorage.getItem("simonKeySet") || "vowels";
+          this.setKeySet(savedKeySet);
+          this.setupEventListeners();
+        }
+
+        setupEventListeners() {
+          const customizerButtons =
+            document.querySelectorAll(".customizer-btn");
+          customizerButtons.forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              const keySet = e.target.dataset.keySet;
+              this.setKeySet(keySet);
+            });
+          });
+        }
+
+        setKeySet(keySetName) {
+          // Update active button
+          document.querySelectorAll(".customizer-btn").forEach((btn) => {
+            btn.classList.remove("active");
+          });
+          document
+            .querySelector(`[data-key-set="${keySetName}"]`)
+            .classList.add("active");
+
+          // Save key set preference
+          this.currentKeySet = keySetName;
+          localStorage.setItem("simonKeySet", keySetName);
+        }
+
+        getKeySetForComplexity(complexity) {
+          // Override difficulty-based key selection with user preference
+          switch (this.currentKeySet) {
+            case "vowels":
+              return [65, 69, 73, 79, 85]; // A, E, I, O, U
+            case "alphabet":
+              return Array.from({ length: 26 }, (_, i) => i + 65); // A-Z
+            case "numbers":
+              return Array.from({ length: 10 }, (_, i) => i + 48); // 0-9
+            case "mixed":
+              return [
+                ...Array.from({ length: 10 }, (_, i) => i + 48),
+                ...Array.from({ length: 26 }, (_, i) => i + 65),
+              ];
+            default:
+              return [65, 69, 73, 79, 85]; // Default to vowels
+          }
+        }
+      }
+
+      // Initialize managers
+      const themeManager = new ThemeManager();
+      const keyCustomizer = new KeyCustomizer();
+
+      // Override difficulty manager to use custom key sets
+      const originalGetKeySetForComplexity =
+        difficultyManager.getKeySetForComplexity.bind(difficultyManager);
+      difficultyManager.getKeySetForComplexity = function (complexity) {
+        return keyCustomizer.getKeySetForComplexity(complexity);
+      };
+
+      // Initialize high score display
+      updateHighScoreDisplay();
+
+      // Start the game
       siguienteNivel(0);
-
-      function generarTeclas(niveles) {
-        return new Array(niveles).fill(0).map(generarTeclaAleatoria);
-      }
-
-      function generarTeclaAleatoria() {
-        const min = 65;
-        const max = 90;
-
-        return Math.round(Math.random() * (max - min) + min);
-      }
 
       function getElementByKeyCode(keyCode) {
         return document.querySelector(`[data-key="${keyCode}"]`);
