@@ -50,9 +50,9 @@ body.theme-neon {
   --bg-secondary: #1a0a1a;
   --text-primary: #00ffff;
   --text-secondary: #ff00ff;
-  --key-bg: rgba(0, 255, 255, 0.1);
+  --key-bg: rgba(0, 255, 255, 0.15);
   --key-border: #00ffff;
-  --key-text: #00ffff;
+  --key-text: #ffffff;
   --success-color: #00ff00;
   --fail-color: #ff0080;
   --active-color: #ffff00;
@@ -64,9 +64,9 @@ body.theme-ocean {
   --bg-secondary: #002244;
   --text-primary: #88ccff;
   --text-secondary: #66aaff;
-  --key-bg: rgba(136, 204, 255, 0.1);
+  --key-bg: rgba(136, 204, 255, 0.15);
   --key-border: #88ccff;
-  --key-text: #88ccff;
+  --key-text: #ffffff;
   --success-color: #00ff88;
   --fail-color: #ff4444;
   --active-color: #ffffff;
@@ -78,9 +78,9 @@ body.theme-sunset {
   --bg-secondary: #4a2c1a;
   --text-primary: #ffaa44;
   --text-secondary: #ff8844;
-  --key-bg: rgba(255, 170, 68, 0.1);
+  --key-bg: rgba(255, 170, 68, 0.15);
   --key-border: #ffaa44;
-  --key-text: #ffaa44;
+  --key-text: #ffffff;
   --success-color: #44ff44;
   --fail-color: #ff4444;
   --active-color: #ffffff;
@@ -92,9 +92,9 @@ body.theme-forest {
   --bg-secondary: #1a2a1a;
   --text-primary: #88ff88;
   --text-secondary: #66cc66;
-  --key-bg: rgba(136, 255, 136, 0.1);
+  --key-bg: rgba(136, 255, 136, 0.15);
   --key-border: #88ff88;
-  --key-text: #88ff88;
+  --key-text: #ffffff;
   --success-color: #44ff44;
   --fail-color: #ff6666;
   --active-color: #ffffff;
@@ -117,8 +117,9 @@ body.theme-forest {
 }
 
 .number-row .key {
-  background-color: #34495e;
-  border-color: #34495e;
+  background: var(--key-bg);
+  border-color: var(--key-border);
+  color: var(--key-text);
 }
 
 .key {
@@ -127,15 +128,17 @@ body.theme-forest {
   padding: 36px 10px;
   border: 4px solid var(--key-border);
   border-radius: 10px;
-  margin: 0 11px;
+  margin: 0 8px; /* Reduced margin for tighter spacing */
   text-transform: uppercase;
   text-align: center;
   font-size: 24px;
+  font-weight: bold; /* Added bold for better contrast */
   transition: all ease 0.5s;
   background: var(--key-bg);
   color: var(--key-text);
   position: relative;
   overflow: hidden;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5); /* Added text shadow for better readability */
 }
 
 .key::before {
@@ -216,7 +219,7 @@ body.theme-forest {
 /* Key Customizer */
 .key-customizer {
   position: fixed;
-  top: 120px;
+  top: 140px; /* Increased from 120px to create gap */
   left: 20px;
   background: var(--bg-secondary);
   color: var(--text-primary);
@@ -353,7 +356,7 @@ body.theme-forest {
 .difficulty-indicator {
   position: fixed;
   top: 20px;
-  right: 200px;
+  right: 220px; /* Increased from 200px to create gap from score display */
   background: var(--bg-secondary);
   color: var(--text-primary);
   padding: 10px 15px;

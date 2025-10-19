@@ -193,3 +193,4 @@ Have fun training your memory with Simon Dice! Challenge yourself to beat your h
 ---
 
 **Made with ❤️ for memory training enthusiasts**
+
